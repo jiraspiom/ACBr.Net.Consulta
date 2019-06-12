@@ -49,10 +49,10 @@ namespace ACBr.Net.Consulta.Receita
 	public sealed class ACBrConsultaCPF : ACBrComponentConsulta
 	{
 		#region Field
-
-		private const string urlBaseReceitaFederal = "https://cpf.receita.fazenda.gov.br/situacao/";
+		
+		private const string urlBaseReceitaFederal = "https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/";
 		private const string paginaValidacao = "ConsultaSituacao.asp";
-		private const string paginaPrincipal = "defaultSonoro.asp";
+		private const string paginaPrincipal = "ConsultaPublica.asp";
 
 		#endregion Field
 
@@ -103,9 +103,9 @@ namespace ACBr.Net.Consulta.Receita
 		/// <returns>Dados da pessoa.</returns>
 		public ACBrPessoa Consulta(string cpf, DateTime dataNascimento, string captcha = "")
 		{
-			Guard.Against<ACBrException>(cpf.IsEmpty(), "Necess·rio informar o CPF.");
-			Guard.Against<ACBrException>(dataNascimento == DateTime.MinValue, "Necess·rio informar a data de nascimento.");
-			Guard.Against<ACBrException>(!cpf.IsCPF(), "CPF inv·lido.");
+			Guard.Against<ACBrException>(cpf.IsEmpty(), "Necess√°rio informar o CPF.");
+			Guard.Against<ACBrException>(dataNascimento == DateTime.MinValue, "Necess√°rio informar a data de nascimento.");
+			Guard.Against<ACBrException>(!cpf.IsCPF(), "CPF inv√°lido.");
 
 			if (captcha.IsEmpty() && OnGetCaptcha != null)
 			{
@@ -115,7 +115,7 @@ namespace ACBr.Net.Consulta.Receita
 				captcha = e.Captcha;
 			}
 
-			Guard.Against<ACBrException>(captcha.IsEmpty(), "Necess·rio digitar o captcha.");
+			Guard.Against<ACBrException>(captcha.IsEmpty(), "Necess√°rio digitar o captcha.");
 
 			var request = GetClient(urlBaseReceitaFederal + paginaValidacao);
 			request.KeepAlive = false;
@@ -129,10 +129,10 @@ namespace ACBr.Net.Consulta.Receita
 
 			var retorno = request.SendPost(postData, Encoding.UTF8);
 
-			Guard.Against<ACBrCaptchaException>(retorno.Contains("Os caracteres da imagem n„o foram preenchidos corretamente."), "Os caracteres da imagem n„o foram preenchidos corretamente.");
-			Guard.Against<ACBrException>(retorno.Contains("O n˙mero do CPF n„o È v·lido."), "EO n˙mero do CPF n„o È v·lido. Verifique se o mesmo foi digitado corretamente.");
-			Guard.Against<ACBrException>(retorno.Contains("N„o existe no Cadastro de Pessoas JurÌdicas o n˙mero de CPF informado."), $"N„o existe no Cadastro de Pessoas JurÌdicas o n˙mero de CPF informado.{Environment.NewLine}Verifique se o mesmo foi digitado corretamente.");
-			Guard.Against<ACBrException>(retorno.Contains("a. No momento n„o podemos atender a sua solicitaÁ„o. Por favor tente mais tarde."), "Erro no site da receita federal. Tente mais tarde.");
+			Guard.Against<ACBrCaptchaException>(retorno.Contains("Os caracteres da imagem n√£o foram preenchidos corretamente."), "Os caracteres da imagem n√£o foram preenchidos corretamente.");
+			Guard.Against<ACBrException>(retorno.Contains("O n√∫mero do CPF n√£o √© v√°lido."), "EO n√∫mero do CPF n√£o √© v√°lido. Verifique se o mesmo foi digitado corretamente.");
+			Guard.Against<ACBrException>(retorno.Contains("N√£o existe no Cadastro de Pessoas Jur√≠dicas o n√∫mero de CPF informado."), $"N√£o existe no Cadastro de Pessoas Jur√≠dicas o n√∫mero de CPF informado.{Environment.NewLine}Verifique se o mesmo foi digitado corretamente.");
+			Guard.Against<ACBrException>(retorno.Contains("a. No momento n√£o podemos atender a sua solicita√ß√£o. Por favor tente mais tarde."), "Erro no site da receita federal. Tente mais tarde.");
 
 			return new ACBrPessoa(retorno);
 		}
